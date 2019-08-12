@@ -67,6 +67,57 @@ public class PostController {
 		return mv;
 	}
 	
+	@RequestMapping(value = "/read/{id}", method=RequestMethod.POST) //vem como Post, pois no read.jsp tenho um formulario como post
+	public ModelAndView read(String idPost, @Valid Comment comment, BindingResult result, RedirectAttributes attributes) {		
+		
+		if (!comment.getTexto().isEmpty()) { //verifico se o texto está vazio
+			
+			int id_post = Integer.parseInt(idPost);
+			Post post = postRepository.findOne((long) id_post); //Se não estiver vazio, eu recupero o post para a variavel post
+			
+			comment.setData(new Date(System.currentTimeMillis())); //seto a data do comentario
+			comment.setThumbsUp(0L); //seto as variaveis de curtir como zero
+			comment.setThumbsDown(0L);
+			comment.setPost(post); //associo ao post do comentario
+			
+			commentRepository.save(comment); //salvo o comentario
+		}
+		
+		ModelAndView mv = new ModelAndView("redirect:/app/posts/read/" + idPost); //Caso o comentario esteja vazio, redireciona para o mesmo post
+		
+		return mv;
+	}
+	
+	@RequestMapping(value = "/thumbsUp/{id}", method=RequestMethod.GET) //Pegaremos via Get qual comentario devo somar mais uma curtida
+	public ModelAndView thumbsUp(@PathVariable String id) {		
+		
+		long id_comment = Long.parseLong(id);		
+		Comment comment = commentRepository.findOne(id_comment); //recupero a informacao
+		
+		comment.setThumbsUp(comment.getThumbsUp() + 1L); //somo mais um ao meu comentario
+		
+		commentRepository.save(comment); //salvo no banco
+		
+		ModelAndView mv = new ModelAndView("redirect:/app/posts/read/" + comment.getPost().getId().toString()); //redireciono para o read e passo qual o ID do comentario afetado
+		
+		return mv;
+	}
+	
+	@RequestMapping(value = "/thumbsDown/{id}", method=RequestMethod.GET) //Pegaremos via Get qual comentario devo somar mais um deslike
+	public ModelAndView thumbsDown(@PathVariable String id) {		
+		
+		long id_comment = Long.parseLong(id);		
+		Comment comment = commentRepository.findOne(id_comment); //recupero a informacao
+		
+		comment.setThumbsDown(comment.getThumbsDown() + 1L); //somo mais um ao deslike do meu comentario
+		
+		commentRepository.save(comment); //salvo no banco
+		
+		ModelAndView mv = new ModelAndView("redirect:/app/posts/read/" + comment.getPost().getId().toString()); //redireciono para o read e passo qual o ID do comentario afetado
+		
+		return mv;
+	}
+	
 	@RequestMapping(value = "/create", method = RequestMethod.GET)
 	public ModelAndView create(Post post) {
 		ModelAndView mv = new ModelAndView("posts/create");

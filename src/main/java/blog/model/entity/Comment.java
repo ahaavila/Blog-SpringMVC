@@ -30,13 +30,61 @@ public class Comment {
 	private Date data;
 	
 	@NotNull
-	private Long thumpsUp;
+	private Long thumbsUp;
 	
 	@NotNull
-	private Long thumpsDown;
+	private Long thumbsDown;
 	
 	@ManyToOne
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Post post; //Falo que cada comentario está associado a um post
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getTexto() {
+		return texto;
+	}
+
+	public void setTexto(String texto) {
+		this.texto = texto;
+	}
+
+	public Date getData() {
+		return data;
+	}
+
+	public void setData(Date data) {
+		this.data = data;
+	}
+
+	public Long getThumbsUp() {
+		return thumbsUp;
+	}
+
+	public void setThumbsUp(Long thumpsUp) {
+		this.thumbsUp = thumpsUp;
+	}
+
+	public Long getThumbsDown() {
+		return thumbsDown;
+	}
+
+	public void setThumbsDown(Long thumpsDown) {
+		this.thumbsDown = thumpsDown;
+	}
+
+	public Post getPost() {
+		return post;
+	}
+
+	public void setPost(Post post) {
+		this.post = post;
+	}
 	
 }
