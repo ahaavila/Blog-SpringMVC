@@ -40,7 +40,10 @@ public class PostController {
 	@RequestMapping(value = {"", "/", "/index"}, method=RequestMethod.GET)
 	public ModelAndView index() {
 		ModelAndView mv = new ModelAndView("posts/index");	//referencia a view post/index
-		Iterable<Post> posts = postRepository.findAll(); //pega todas as informações do banco de dados e coloca dois objetos nessa pagina
+		
+		long id_user = getAuthenticatedUser();	//autentica o usuario logado
+		Iterable<Post> posts = postRepository.findByAutor(id_user); //pega os posts daquele ator logado
+		
 		mv.addObject("titulo", "Lista de Posts"); // coloca o titulo, uma string
 		mv.addObject("posts", posts);	// e o posts e pega a variavel posts "Iterable<Post> posts" e coloca aqui dentro
 		return mv;
@@ -130,8 +133,8 @@ public class PostController {
 				
 		//Pegar as informacoes do usuario e transmiti-las
 		long id_user = getAuthenticatedUser();
-		
 		Users user = usersRepository.findOne(id_user);
+		
 		post.setAutor(user);
 		
 		if (result.hasErrors()) {
@@ -169,7 +172,22 @@ public class PostController {
 		
 		ModelAndView mv = new ModelAndView("redirect:/app/posts");		
 		return mv;
-	}	
+	}
+	
+	@RequestMapping(value = "/delete_comment/{id}", method=RequestMethod.GET) //Pegaremos via Get qual comentario vamos deletar
+	public ModelAndView delete_comment(@PathVariable String id) {		
+		
+		long id_comment = Long.parseLong(id);		
+		Comment comment = commentRepository.findOne(id_comment); //recupero o comentario no banco atraves do ID
+		
+		long id_post = comment.getPost().getId(); //recupero o Id do post que está o comentario
+		
+		commentRepository.delete(comment); //deleta o comentario
+		
+		ModelAndView mv = new ModelAndView("redirect:/app/posts/read/" + id_post); //redireciono para o read do post
+		
+		return mv;
+	}
 	
 	@RequestMapping(value = "/delete/{id}", method=RequestMethod.GET)
 	public ModelAndView delete(@PathVariable String id) {

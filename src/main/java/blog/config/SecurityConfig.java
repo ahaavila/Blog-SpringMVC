@@ -30,20 +30,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	protected void configure(HttpSecurity http) throws Exception {
 		http.
 			authorizeRequests()
-				.antMatchers("/app/users/**").access("hasRole('ROLE_ADMIN')")
+				.antMatchers("/app/posts/list", "/app/posts/read/**", "/app/posts/thumbsUp/**", "/app/posts/thumbsDown/**").permitAll()
+				.antMatchers("app/users/**", "/app/posts/delete_comment/**").access("hasRole('ROLE_ADMIN')") //Um usuario não pode apagar os comentarios dos posts, apenas o administrador
+				.antMatchers("/app/posts/**").access("hasRole('ROLE_USER')") //Um usuario comum consegue visualizar os posts
 				.anyRequest().permitAll()				
 				.and()
-			.formLogin() 
-				.loginPage("/login.jsp")
-				.loginProcessingUrl("/autenticar")  //blog autenticar
-				.defaultSuccessUrl("/app/users")
-				.failureUrl("/login.jsp?error=true")
-				.usernameParameter("username") //.usernameParameter("usuario")
-				.passwordParameter("password")  //.passwordParameter("senha")
-		
-			.and()
-				.logout()
-				.logoutUrl("/logout")  //blog/logout
-				.logoutSuccessUrl("/login.jsp?logout=true");			
+				.formLogin() 
+					.loginPage("/login.jsp")
+					.loginProcessingUrl("/autenticar")  //blog autenticar
+					.defaultSuccessUrl("/app/posts/list")
+					.failureUrl("/login.jsp?error=true")
+					.usernameParameter("username") //.usernameParameter("usuario")
+					.passwordParameter("password")  //.passwordParameter("senha")
+			
+				.and()
+					.logout()
+					.logoutUrl("/logout")  //blog/logout
+					.logoutSuccessUrl("/login.jsp?logout=true");			
 	}	
 } 
